@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Resume Builder</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .resume-preview {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            max-height: 800px;
+            overflow-y: auto;
+        }
+        
+        .template-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .template-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .template-card.selected {
+            border: 3px solid #3b82f6;
+            transform: translateY(-5px);
+        }
+        
+        .highlight-suggestion {
+            background-color: #e9f7fe;
+            padding: 2px 4px;
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .tooltip {
+            visibility: hidden;
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .highlight-suggestion:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .job-card {
+            transition: transform 0.3s ease;
+        }
+        
+        .job-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <header class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <i class="bi bi-file-earmark-text text-3xl mr-3"></i>
+                    <h1 class="text-2xl font-bold">AI Resume Builder</h1>
+                </div>
+                <nav>
+                    <ul class="flex space-x-6">
+                        <li><a href="#" class="hover:text-blue-200 transition">Home</a></li>
+                        <li><a href="#" class="hover:text-blue-200 transition">Templates</a></li>
+                        <li><a href="#" class="hover:text-blue-200 transition">Job Matching</a></li>
+                        <li><a href="#" class="hover:text-blue-200 transition">Pricing</a></li>
+                        <li><a href="#" class="hover:text-blue-200 transition">Help</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Left Sidebar - Resume Form -->
+            <div class="w-full md:w-2/5">
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="bi bi-person-circle mr-2"></i>
+                        Personal Information
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1" for="firstName">First Name</label>
+                                <input type="text" id="firstName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="John">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1" for="lastName">Last Name</label>
+                                <input type="text" id="lastName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Doe">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1" for="jobTitle">Job Title</label>
+                            <input type="text" id="jobTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Software Engineer">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1" for="email">Email</label>
+                            <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="john.doe@example.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1" for="phone">Phone</label>
+                            <input type="tel" id="phone" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="(123) 456-7890">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1" for="location">Location</label>
+                            <input type="text" id="location" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="New York, NY">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold flex items-center">
+                            <i class="bi bi-briefcase mr-2"></i>
+                            Experience
+                        </h2>
+                        <button id="addExperience" class="text-blue-500 hover:text-blue-700 transition">
+                            <i class="bi bi-plus-circle"></i> Add
+                        </button>
+                    </div>
+                    <div id="experienceContainer" class="space-y-6">
+                        <div class="experience-entry border-b pb-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Senior Developer">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tech Solutions Inc.">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                                    <input type="month" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                                    <input type="month" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                <textarea class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Describe your responsibilities and achievements..."></textarea>
+                            </div>
+                            <div class="mt-3">
+                                <button class="text-red-500 hover:text-red-700 transition text-sm">
+                                    <i class="bi bi-trash"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold flex items-center">
+                            <i class="bi bi-book mr-2"></i>
+                            Education
+                        </h2>
+                        <button id="addEducation" class="text-blue-500 hover:text-blue-700 transition">
+                            <i class="bi bi-plus-circle"></i> Add
+                        </button>
+                    </div>
+                    <div id="educationContainer" class="space-y-6">
+                        <div class="education-entry border-b pb-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Degree</label>
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Bachelor of Science">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Institution</label>
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="University of Technology">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                                    <input type="month" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                                    <input type="month" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                <textarea class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" rows="2" placeholder="Additional information..."></textarea>
+                            </div>
+                            <div class="mt-3">
+                                <button class="text-red-500 hover:text-red-700 transition text-sm">
+                                    <i class="bi bi-trash"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="bi bi-lightning-charge mr-2"></i>
+                        Skills
+                    </h2>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Add Skills (separated by commas)</label>
+                        <input type="text" id="skillInput" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="JavaScript, React, Node.js">
+                        <button id="addSkill" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition">Add Skills</button>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="text-sm font-medium text-gray-700 mb-2">Your Skills:</h3>
+                        <div id="skillsContainer" class="flex flex-wrap gap-2">
+                            <span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-1 rounded flex items-center">
+                                JavaScript
+                                <button class="ml-1 text-blue-800 hover:text-blue-500">×</button>
+                            </span>
+                            <span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-1 rounded flex items-center">
+                                React
+                                <button class="ml-1 text-blue-800 hover:text-blue-500">×</button>
+                            </span>
+                            <span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-1 rounded flex items-center">
+                                Node.js
+                                <button class="ml-1 text-blue-800 hover:text-blue-500">×</button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="text-sm font-medium text-gray-700 mb-2">AI Suggested Skills:</h3>
+                        <div id="suggestedSkillsContainer" class="flex flex-wrap gap-2">
+                            <span class="bg-green-100 text-green-800 text-sm font-medium px-2.5 py-1 rounded flex items-center cursor-pointer hover:bg-green-200">
+                                TypeScript
+                                <button class="ml-1 text-green-800 hover:text-green-500">+</button>
+                            </span>
+                            <span class="bg-green-100 text-green-800 text-sm font-medium px-2.5 py-1 rounded flex items-center cursor-pointer hover:bg-green-200">
+                                Express.js
+                                <button class="ml-1 text-green-800 hover:text-green-500">+</button>
+                            </span>
+                            <span class="bg-green-100 text-green-800 text-sm font-medium px-2.5 py-1 rounded flex items-center cursor-pointer hover:bg-green-200">
+                                MongoDB
+                                <button class="ml-1 text-green-800 hover:text-green-500">+</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Targeting Section -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="bi bi-bullseye mr-2"></i>
+                        Target Job Description
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Paste job description for AI optimization</label>
+                            <textarea id="jobDescription" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" rows="4" placeholder="Paste the job description here to get AI suggestions for optimizing your resume..."></textarea>
+                        </div>
+                        <button id="analyzeJob" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition flex items-center justify-center">
+                            <i class="bi bi-magic mr-2"></i> 
+                            Analyze & Optimize
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Preview and Templates -->
+            <div class="w-full md:w-3/5">
+                <!-- Template Selection -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-xl font-semibold mb-4">Choose a Template</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div class="template-card selected rounded-lg overflow-hidden border-2">
+                            <img src="https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3" alt="Professional template" class="w-full h-32 object-cover">
+                            <div class="p-2 text-center">
+                                <h3 class="font-medium">Professional</h3>
+                            </div>
+                        </div>
+                        <div class="template-card rounded-lg overflow-hidden border-2">
+                            <img src="https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3" alt="Modern template" class="w-full h-32 object-cover">
+                            <div class="p-2 text-center">
+                                <h3 class="font-medium">Modern</h3>
+                            </div>
+                        </div>
+                        <div class="template-card rounded-lg overflow-hidden border-2">
+                            <img src="https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3" alt="Creative template" class="w-full h-32 object-cover">
+                            <div class="p-2 text-center">
+                                <h3 class="font-medium">Creative</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Feedback -->
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-start">
+                        <div class="text-yellow-500 mr-3 text-xl">
+                            <i class="bi bi-lightbulb-fill"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-yellow-800 mb-1">AI Suggestions</h3>
+                            <ul class="text-sm text-yellow-700 space-y-2">
+                                <li class="flex items-start">
+                                    <i class="bi bi-arrow-right-circle mr-2 mt-0.5"></i>
+                                    <span>Consider adding quantifiable achievements to your experience section</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="bi bi-arrow-right-circle mr-2 mt-0.5"></i>
+                                    <span>Your resume would benefit from adding cloud technologies to your skills</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="bi bi-arrow-right-circle mr-2 mt-0.5"></i>
+                                    <span>Add a brief professional summary to capture attention</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resume Preview -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold">Resume Preview</h2>
+                        <div class="flex space-x-3">
+                            <button class="text-blue-500 hover:text-blue-700 transition flex items-center">
+                                <i class="bi bi-download mr-1"></i> Download PDF
+                            </button>
+                            <button class="text-blue-500 hover:text-blue-700 transition flex items-center">
+                                <i class="bi bi-share mr-1"></i> Share
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Resume Document Preview -->
+                    <div class="resume-preview border rounded-lg p-8">
+                        <div class="text-center mb-6">
+                            <h1 class="text-3xl font-bold" id="previewName">John Doe</h1>
+                            <p class="text-lg text-gray-600" id="previewJobTitle">Senior Software Engineer</p>
+                            <div class="flex justify-center items-center mt-2 text-gray-600 text-sm space-x-3">
+                                <span id="previewEmail">john.doe@example.com</span>
+                                <span>•</span>
+                                <span id="previewPhone">(123) 456-7890</span>
+                                <span>•</span>
+                                <span id="previewLocation">New York, NY</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <h2 class="text-lg font-semibold border-b-2 border-gray-300 pb-1 mb-3">Professional Summary</h2>
+                            <p class="text-gray-700">
+                                <span class="highlight-suggestion">Experienced software engineer with over 5 years of expertise in full-stack development.
+                                    <span class="tooltip">AI suggestion: Strong opening that highlights experience level</span>
+                                </span> 
+                                Passionate about building scalable applications and solving complex problems. Proven track record of delivering high-quality products on time and within budget.
+                            </p>
+                        </div>
+
+                        <div class="mb-6">
+                            <h2 class="text-lg font-semibold border-b-2 border-gray-300 pb-1 mb-3">Experience</h2>
+                            <div class="mb-4">
+                                <div class="flex justify-between">
+                                    <h3 class="font-medium">Senior Developer</h3>
+                                    <span class="text-gray-600 text-sm">Jan 2020 - Present</span>
+                                </div>
+                                <div class="text-gray-600 italic">Tech Solutions Inc.</div>
+                                <ul class="text-gray-700 mt-2 list-disc list-inside">
+                                    <li>
+                                        <span class="highlight-suggestion">Led a team of 5 developers to deliver a complex e-commerce platform, increasing client sales by 45%.
+                                            <span class="tooltip">AI suggestion: Great use of metrics to show impact</span>
+                                        </span>
+                                    </li>
+                                    <li>Architected and implemented RESTful APIs and microservices using Node.js and Express.</li>
+                                    <li>Optimized database queries resulting in a 30% increase in application performance.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <div class="flex justify-between">
+                                    <h3 class="font-medium">Web Developer</h3>
+                                    <span class="text-gray-600 text-sm">Jun 2017 - Dec 2019</span>
+                                </div>
+                                <div class="text-gray-600 italic">Digital Innovations Co.</div>
+                                <ul class="text-gray-700 mt-2 list-disc list-inside">
+                                    <li>Developed responsive web applications using React and Redux.</li>
+                                    <li>
+                                        <span class="highlight-suggestion">Collaborated with UX designers to implement user-centered design principles.
+                                            <span class="tooltip">AI suggestion: Shows good cross-functional collaboration</span>
+                                        </span>
+                                    </li>
+                                    <li>Participated in code reviews and implemented best practices for code quality.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <h2 class="text-lg font-semibold border-b-2 border-gray-300 pb-1 mb-3">Education</h2>
+                            <div>
+                                <div class="flex justify-between">
+                                    <h3 class="font-medium">Bachelor of Science in Computer Science</h3>
+                                    <span class="text-gray-600 text-sm">Sep 2013 - May 2017</span>
+                                </div>
+                                <div class="text-gray-600 italic">University of Technology</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h2 class="text-lg font-semibold border-b-2 border-gray-300 pb-1 mb-3">Skills</h2>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded">JavaScript</span>
+                                <span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded">React</span>
+                                <span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded">Node.js</span>
+                                <span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded">Express</span>
+                                <span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded">MongoDB</span>
+                                <span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded">Git</span>
+                                <span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded">REST APIs</span>
+                                <span class="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded">HTML/CSS</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Matching -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="bi bi-briefcase mr-2"></i>
+                        Job Matches Based on Your Resume
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="job-card p-4 border rounded-md hover:shadow-md transition">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-semibold">Senior Full Stack Developer</h3>
+                                    <p class="text-gray-600">TechGlobal Inc.</p>
+                                </div>
+                                <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">95% Match</span>
+                            </div>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-700 line-clamp-2">Looking for an experienced developer with React, Node.js, and cloud expertise to join our growing team...</p>
+                            </div>
+                            <div class="mt-3 flex justify-between items-center">
+                                <span class="text-sm text-gray-500">New York, NY • $120K - $150K</span>
+                                <button class="text-blue-500 hover:text-blue-700 transition text-sm">View Details</button>
+                            </div>
+                        </div>
+
+                        <div class="job-card p-4 border rounded-md hover:shadow-md transition">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-semibold">Full Stack JavaScript Developer</h3>
+                                    <p class="text-gray-600">Innovative Solutions</p>
+                                </div>
+                                <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">87% Match</span>
+                            </div>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-700 line-clamp-2">Join our agile team to build scalable web applications using modern JavaScript frameworks...</p>
+                            </div>
+                            <div class="mt-3 flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Remote • $100K - $130K</span>
+                                <button class="text-blue-500 hover:text-blue-700 transition text-sm">View Details</button>
+                            </div>
+                        </div>
+
+                        <div class="job-card p-4 border rounded-md hover:shadow-md transition">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-semibold">Senior Frontend Developer</h3>
+                                    <p class="text-gray-600">Digital Creations LLC</p>
+                                </div>
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">78% Match</span>
+                            </div>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-700 line-clamp-2">Creating engaging user interfaces with React and modern frontend technologies...</p>
+                            </div>
+                            <div class="mt-3 flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Boston, MA • $110K - $140K</span>
+                                <button class="text-blue-500 hover:text-blue-700 transition text-sm">View Details</button>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button class="text-blue-500 hover:text-blue-700 transition flex items-center mx-auto">
+                                <i class="bi bi-search mr-1"></i> View More Job Matches
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">AI Resume Builder</h3>
+                    <p class="text-gray-400 text-sm">Create professional resumes with the power of AI to help you land your dream job.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Features</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-blue-300 transition">AI Resume Optimization</a></li>
+                        <li><a href="#" class="hover:text-blue-300 transition">Professional Templates</a></li>
+                        <li><a href="#" class="hover:text-blue-300 transition">Job Matching</a></li>
+                        <li><a href="#" class="hover:text-blue-300 transition">Career Advice</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Company</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-blue-300 transition">About Us</a></li>
+                        <li><a href="#" class="hover:text-blue-300 transition">Pricing</a></li>
+                        <li><a href="#" class="hover:text-blue-300 transition">Blog</a></li>
+                        <li><a href="#" class="hover:text-blue-300 transition">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Connect</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="bi bi-facebook text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="bi bi-twitter text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="bi bi-linkedin text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="bi bi-instagram text-xl"></i></a>
+                    </div>
+                    <p class="text-gray-400 text-sm">Subscribe to our newsletter:</p>
+                    <div class="flex mt-2">
+                        <input type="email" placeholder="Your email" class="px-3 py-2 rounded-l-md w-full text-gray-800 focus:outline-none">
+                        <button class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-r-md transition">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-6 text-sm text-gray-400">
+                <p>© 2023 AI Resume Builder. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update preview values based on form inputs
+            const updatePreview = () => {
+                const firstName = document.getElementById('firstName').value || 'John';
+                const lastName = document.getElementById('lastName').value || 'Doe';
+                const jobTitle = document.getElementById('jobTitle').value || 'Senior Software Engineer';
+                const email = document.getElementById('email').value || 'john.doe@example.com';
+                const phone = document.getElementById('phone').value || '(123) 456-7890';
+                const location = document.getElementById('location').value || 'New York, NY';
+
+                document.getElementById('previewName').textContent = `${firstName} ${lastName}`;
+                document.getElementById('previewJobTitle').textContent = jobTitle;
+                document.getElementById('previewEmail').textContent = email;
+                document.getElementById('previewPhone').textContent = phone;
+                document.getElementById('previewLocation').textContent = location;
+            };
+
+            // Add event listeners to form fields
+            document.getElementById('firstName').addEventListener('input', updatePreview);
+            document.getElementById('lastName').addEventListener('input', updatePreview);
+            document.getElementById('jobTitle').addEventListener('input', updatePreview);
+            document.getElementById('email').addEventListener('input', updatePreview);
+            document.getElementById('phone').addEventListener('input', updatePreview);
+            document.getElementById('location').addEventListener('input', updatePreview);
+
+            // Handle template selection
+            const templateCards = document.querySelectorAll('.template-card');
+            templateCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove selected class from all cards
+                    templateCards.forEach(c => c.classList.remove('selected'));
+                    // Add selected class to clicked card
+                    this.classList.add('selected');
+                });
+            });
+
+            // Handle add experience button
+            document.getElementById('addExperience').addEventListener('click', function() {
+                const container = document.getElementById('experienceContainer');
+                const template = container.querySelector('.experience-entry').cloneNode(true);
+                
+                // Clear input values
+                template.querySelectorAll('input, textarea').forEach(input => input.value = '');
+                
+                // Add remove event listener
+                template.querySelector('.text-red-500').addEventListener('click', function() {
+                    container.removeChild(template);
+                });
+                
+                container.appendChild(template);
+            });
+
+            // Handle add education button
+            document.getElementById('addEducation').addEventListener('click', function() {
+                const container = document.getElementById('educationContainer');
+                const template = container.querySelector('.education-entry').cloneNode(true);
+                
+                // Clear input values
+                template.querySelectorAll('input, textarea').forEach(input => input.value = '');
+                
+                // Add remove event listener
+                template.querySelector('.text-red-500').addEventListener('click', function() {
+                    container.removeChild(template);
+                });
+                
+                container.appendChild(template);
+            });
+
+            // Handle skill removal
+            const skillsContainer = document.getElementById('skillsContainer');
+            skillsContainer.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.parentElement.remove();
+                });
+            });
+
+            // Handle adding skills
+            document.getElementById('addSkill').addEventListener('click', function() {
+                const skillInput = document.getElementById('skillInput');
+                const skills = skillInput.value.split(',').map(skill => skill.trim()).filter(skill => skill);
+                
+                if (skills.length > 0) {
+                    skills.forEach(skill => {
+                        const skillSpan = document.createElement('span');
+                        skillSpan.className = 'bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-1 rounded flex items-center';
+                        skillSpan.innerHTML = `
+                            ${skill}
+                            <button class="ml-1 text-blue-800 hover:text-blue-500">×</button>
+                        `;
+                        
+                        // Add remove event listener
+                        skillSpan.querySelector('button').addEventListener('click', function() {
+                            this.parentElement.remove();
+                        });
+                        
+                        skillsContainer.appendChild(skillSpan);
+                    });
+                    
+                    skillInput.value = '';
+                }
+            });
+
+            // Handle adding suggested skills
+            const suggestedSkillsContainer = document.getElementById('suggestedSkillsContainer');
+            suggestedSkillsContainer.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const skill = this.parentElement.textContent.trim().slice(0, -1);
+                    
+                    const skillSpan = document.createElement('span');
+                    skillSpan.className = 'bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-1 rounded flex items-center';
+                    skillSpan.innerHTML = `
+                        ${skill}
+                        <button class="ml-1 text-blue-800 hover:text-blue-500">×</button>
+                    `;
+                    
+                    // Add remove event listener
+                    skillSpan.querySelector('button').addEventListener('click', function() {
+                        this.parentElement.remove();
+                    });
+                    
+                    skillsContainer.appendChild(skillSpan);
+                    this.parentElement.remove();
+                });
+            });
+
+            // Job description analysis
+            document.getElementById('analyzeJob').addEventListener('click', function() {
+                const jobDescription = document.getElementById('jobDescription').value;
+                if (!jobDescription) return;
+
+                // Simulate loading state
+                this.innerHTML = '<i class="bi bi-hourglass-split mr-2"></i> Analyzing...';
+                this.disabled = true;
+
+                // Simulate AI analysis (in a real app, this would call an API)
+                setTimeout(() => {
+                    // Reset button state
+                    this.innerHTML = '<i class="bi bi-magic mr-2"></i> Analyze & Optimize';
+                    this.disabled = false;
+
+                    // Add feedback based on "analysis"
+                    const aiSuggestions = document.querySelector('.bg-yellow-50 ul');
+                    
+                    // Clear existing suggestions
+                    while (aiSuggestions.firstChild) {
+                        aiSuggestions.removeChild(aiSuggestions.firstChild);
+                    }
+                    
+                    // Add new suggestions based on job description
+                    const suggestions = [
+                        'Your resume is missing Docker experience which is mentioned in the job description',
+                        'Consider highlighting your team leadership experience more prominently',
+                        'Add "CI/CD pipelines" to your skills section to match job requirements',
+                        'Use more specific metrics in your experience section to demonstrate impact'
+                    ];
+                    
+                    suggestions.forEach(suggestion => {
+                        const li = document.createElement('li');
+                        li.className = 'flex items-start';
+                        li.innerHTML = `
+                            <i class="bi bi-arrow-right-circle mr-2 mt-0.5"></i>
+                            <span>${suggestion}</span>
+                        `;
+                        aiSuggestions.appendChild(li);
+                    });
+
+                    // Add new suggested skills based on job description
+                    const suggestedSkillsContainer = document.getElementById('suggestedSkillsContainer');
+                    
+                    // Clear existing suggested skills
+                    while (suggestedSkillsContainer.firstChild) {
+                        suggestedSkillsContainer.removeChild(suggestedSkillsContainer.firstChild);
+                    }
+                    
+                    // Add new suggested skills
+                    const suggestedSkills = ['Docker', 'AWS', 'CI/CD', 'Agile'];
+                    
+                    suggestedSkills.forEach(skill => {
+                        const skillSpan = document.createElement('span');
+                        skillSpan.className = 'bg-green-100 text-green-800 text-sm font-medium px-2.5 py-1 rounded flex items-center cursor-pointer hover:bg-green-200';
+                        skillSpan.innerHTML = `
+                            ${skill}
+                            <button class="ml-1 text-green-800 hover:text-green-500">+</button>
+                        `;
+                        
+                        // Add add event listener
+                        skillSpan.querySelector('button').addEventListener('click', function() {
+                            const skillToAdd = this.parentElement.textContent.trim().slice(0, -1);
+                            
+                            const newSkillSpan = document.createElement('span');
+                            newSkillSpan.className = 'bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-1 rounded flex items-center';
+                            newSkillSpan.innerHTML = `
+                                ${skillToAdd}
+                                <button class="ml-1 text-blue-800 hover:text-blue-500">×</button>
+                            `;
+                            
+                            // Add remove event listener
+                            newSkillSpan.querySelector('button').addEventListener('click', function() {
+                                this.parentElement.remove();
+                            });
+                            
+                            document.getElementById('skillsContainer').appendChild(newSkillSpan);
+                            this.parentElement.remove();
+                        });
+                        
+                        suggestedSkillsContainer.appendChild(skillSpan);
+                    });
+
+                    // Highlight matching keywords in resume
+                    const resumePreview = document.querySelector('.resume-preview');
+                    
+                    // This is a simplified example - in a real app you would use more sophisticated matching
+                    if (jobDescription.toLowerCase().includes('team') && 
+                        resumePreview.innerHTML.includes('Led a team')) {
+                        // Already highlighted
+                    }
+                    
+                    // Update job matches based on new analysis
+                    const jobMatches = document.querySelectorAll('.job-card');
+                    jobMatches[0].querySelector('.text-green-800').textContent = '92% Match';
+                    jobMatches[1].querySelector('.text-green-800').textContent = '84% Match';
+                    jobMatches[2].querySelector('.text-yellow-800').textContent = '75% Match';
+                }, 1500);
+            });
+
+            // Add event listeners to remove buttons for experience and education
+            document.querySelectorAll('.experience-entry .text-red-500, .education-entry .text-red-500').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.closest('.experience-entry, .education-entry').remove();
+                });
+            });
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
